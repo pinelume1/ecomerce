@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AuctionX — E‑Commerce Auction</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Inter', 'ui-sans-serif', 'system-ui']
+          },
+          boxShadow: {
+            soft: '0 6px 30px rgba(2, 6, 23, 0.08)'
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { height: 100%; }
+    .glass { background: rgba(255,255,255,.65); backdrop-filter: blur(8px); }
+    .dark .glass { background: rgba(2,6,23,.55); }
+    .ellipsis-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow: hidden; }
+    .ellipsis-1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tag { font-size: .675rem; }
+    .btn { @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 font-medium shadow-soft hover:shadow transition; }
+    .btn-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
+    .btn-outline { @apply border border-slate-300/50 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50/70 dark:hover:bg-slate-800; }
+    .badge { @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs; }
+    .field { @apply w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500; }
+  </style>
+</head>
+<body class="font-display bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-40 glass border-b border-slate-200/60 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3 py-3">
+      <div class="flex items-center gap-2">
+        <div class="h-9 w-9 rounded-2xl bg-indigo-600 grid place-items-center text-white font-bold">A</div>
+        <a href="#" class="text-xl font-extrabold">AuctionX</a>
+      </div>
+
+      <div class="flex-1 hidden md:flex">
+        <div class="w-full relative">
+          <input id="search" class="field !rounded-2xl pl-10" placeholder="Search items, brands, categories…" />
+          <svg class="w-5 h-5 absolute left-3 top-2.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-5.2-5.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-2 ml-auto">
+        <button id="themeToggle" class="btn btn-outline !px-3" title="Toggle theme">
+          <svg id="sun" class="w-5 h-5 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2M3 12h2m14 0h2m-3.6-6.4 1.4-1.4M5.2 18.8 3.8 20.2M18.8 18.8l1.4 1.4M5.2 5.2 3.8 3.8"/><circle cx="12" cy="12" r="4" stroke-width="2"/></svg>
+          <svg id="moon" class="w-5 h-5 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        </button>
+        <button id="openLogin" class="btn btn-outline">Sign in</button>
+        <button id="openSell" class="btn btn-primary">Sell</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Subnav -->
+  <div class="border-b border-slate-200/60 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex gap-2 overflow-x-auto">
+      <span class="badge border-slate-200 dark:border-slate-800">🔥 Trending</span>
+      <span class="badge border-slate-200 dark:border-slate-800">💎 Collectibles</span>
+      <span class="badge border-slate-200 dark:border-slate-800">📱 Phones</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🎮 Gaming</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🖥️ Laptops</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🏠 Home</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🧰 Tools</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🚗 Motors</span>
+    </div>
+  </div>
+
+  <!-- Hero / Filters -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 p-6 rounded-3xl bg-gradient-to-br from-indigo-600 to-fuchsia-600 text-white shadow-soft">
+      <h1 class="text-3xl md:text-4xl font-extrabold leading-tight">Bid smarter. Win faster. 
+        <span class="block text-white/80 text-lg mt-2">Real‑time auctions with instant checkout and seller protection.</span>
+      </h1>
+      <div class="mt-6 flex gap-3">
+        <button id="openExplore" class="btn bg-white text-indigo-700 hover:bg-slate-100">Explore auctions</button>
+        <button id="openCreate" class="btn btn-outline border-white/60 text-white hover:bg-white/10">Create listing</button>
+      </div>
+    </div>
+    <div class="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 shadow-soft">
+      <h3 class="font-semibold text-lg">Filters</h3>
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <select id="filterCategory" class="field">
+          <option value="">All categories</option>
+          <option>Collectibles</option>
+          <option>Phones</option>
+          <option>Gaming</option>
+          <option>Laptops</option>
+          <option>Home</option>
+          <option>Tools</option>
+        </select>
+        <select id="filterSort" class="field">
+          <option value="endingSoon">Ending soon</option>
+          <option value="new">Newly listed</option>
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="priceDesc">Price: High to Low</option>
+        </select>
+        <input id="filterMin" type="number" class="field" placeholder="Min price" />
+        <input id="filterMax" type="number" class="field" placeholder="Max price" />
+        <label class="col-span-2 inline-flex items-center gap-2 text-sm opacity-80">
+          <input id="filterBuyNow" type="checkbox" class="rounded" /> Buy Now available
+        </label>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button id="applyFilters" class="btn btn-primary w-full">Apply</button>
+        <button id="clearFilters" class="btn btn-outline w-full">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Auctions Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-xl font-bold">Live Auctions</h2>
+      <div class="text-sm opacity-70" id="auctionCount">0 items</div>
+    </div>
+
+    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="hidden text-center p-16 border-2 border-dashed rounded-3xl mt-6">
+      <div class="text-4xl">🧐</div>
+      <p class="mt-3 font-semibold">No auctions found</p>
+      <p class="opacity-70">Try adjusting filters or search.</p>
+    </div>
+  </main>
+
+  <!-- Sell / Create Modal -->
+  <dialog id="sellModal" class="rounded-3xl w-full max-w-2xl p-0 overflow-hidden">
+    <form method="dialog" class="p-0">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="font-semibold">Create Listing</h3>
+        <button class="btn btn-outline !px-3" value="cancel">Close</button>
+      </div>
+      <div class="p-4 grid sm:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <input id="newTitle" class="field" placeholder="Title" required />
+          <textarea id="newDesc" class="field" placeholder="Description"></textarea>
+          <select id="newCategory" class="field">
+            <option>Collectibles</option>
+            <option>Phones</option>
+            <option>Gaming</option>
+            <option>Laptops</option>
+            <option>Home</option>
+            <option>Tools</option>
+          </select>
+          <input id="newImage" class="field" placeholder="Image URL (optional)" />
+        </div>
+        <div class="space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <input id="newStart" type="number" class="field" placeholder="Start price" required />
+            <input id="newIncrement" type="number" class="field" placeholder="Min increment" required />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <input id="newBuyNow" type="number" class="field" placeholder="Buy Now (optional)" />
+            <input id="newDuration" type="number" class="field" placeholder="Duration (mins)" value="60" />
+          </div>
+          <label class="inline-flex items-center gap-2 text-sm opacity-80">
+            <input id="newShipping" type="checkbox" class="rounded" /> Free shipping
+          </label>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+        <button class="btn btn-outline" value="cancel">Cancel</button>
+        <button id="createListing" class="btn btn-primary" value="default">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Auth Modal -->
+  <dialog id="authModal" class="rounded-3xl w-full max-w-md p-0 overflow-hidden">
+    <form method="dialog" class="p-0">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="font-semibold">Welcome</h3>
+        <button class="btn btn-outline !px-3" value="cancel">Close</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <input id="authName" class="field" placeholder="Your display name"/>
+        <input id="authWallet" class="field" placeholder="Wallet (KSh) — optional" type="number" />
+        <p class="text-sm opacity-70">We'll store your session locally only for demo.</p>
+      </div>
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+        <button class="btn btn-outline" value="cancel">Cancel</button>
+        <button id="saveAuth" class="btn btn-primary" value="default">Continue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Bid Modal -->
+  <dialog id="bidModal" class="rounded-3xl w-full max-w-md p-0 overflow-hidden">
+    <form method="dialog" class="p-0">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="font-semibold">Place a bid</h3>
+        <button class="btn btn-outline !px-3" value="cancel">Close</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <div id="bidItem" class="font-semibold"></div>
+        <div class="text-sm opacity-70">Current: <span id="bidCurrent"></span> — Min increment: <span id="bidMin"></span></div>
+        <input id="bidAmount" type="number" class="field" placeholder="Your bid" />
+        <div class="text-sm" id="bidError"></div>
+      </div>
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+        <button class="btn btn-outline" value="cancel">Cancel</button>
+        <button id="submitBid" class="btn btn-primary" value="default">Place bid</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 hidden">
+    <div class="glass rounded-2xl px-4 py-2 border border-slate-200 dark:border-slate-800 shadow-soft text-sm"></div>
+  </div>
+
+  <script>
+    // --- Demo Data ---
+    const sampleAuctions = [
+      {
+        id: crypto.randomUUID(),
+        title: 'iPhone 13 Pro 256GB — Sierra Blue',
+        desc: 'Excellent condition. Battery health 89%. Box + charger. 12 months seller warranty.',
+        category: 'Phones',
+        image: 'https://images.unsplash.com/photo-1631125917297-27d30dc87058?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 55000,
+        minIncrement: 1000,
+        buyNow: 78000,
+        freeShipping: true,
+        endsAt: Date.now() + 1000 * 60 * 45, // 45 mins
+        createdAt: Date.now() - 1000 * 60 * 5,
+        bids: [
+          { user: 'Lena', amount: 56000, time: Date.now() - 1000 * 60 * 4 },
+          { user: 'Omondi', amount: 57500, time: Date.now() - 1000 * 60 * 2 },
+        ],
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Sony PS5 Slim + 2 Controllers',
+        desc: 'Like new. Includes FIFA & Spider‑Man. Nairobi pickup or shipping.',
+        category: 'Gaming',
+        image: 'https://images.unsplash.com/photo-1606813907291-76b3b70c63a0?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 45000,
+        minIncrement: 500,
+        buyNow: 65000,
+        freeShipping: false,
+        endsAt: Date.now() + 1000 * 60 * 8, // 8 mins
+        createdAt: Date.now() - 1000 * 60 * 30,
+        bids: [{ user: 'Jay', amount: 46000, time: Date.now() - 1000 * 60 * 25 }],
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Lenovo Yoga 7 (16GB/512GB) OLED 2‑in‑1',
+        desc: 'Touchscreen, stylus included. Great for creators & students.',
+        category: 'Laptops',
+        image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 72000,
+        minIncrement: 2000,
+        buyNow: 98000,
+        freeShipping: true,
+        endsAt: Date.now() + 1000 * 60 * 120, // 2 hours
+        createdAt: Date.now() - 1000 * 60 * 60,
+        bids: [],
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Vintage Vinyl: Michael Jackson — Thriller (1982) Mint',
+        desc: 'Collector grade. Sleek sound. Ships tracked.',
+        category: 'Collectibles',
+        image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 8000,
+        minIncrement: 250,
+        buyNow: 15000,
+        freeShipping: true,
+        endsAt: Date.now() + 1000 * 60 * 5, // 5 mins
+        createdAt: Date.now() - 1000 * 60 * 240,
+        bids: [{ user: 'Aisha', amount: 8250, time: Date.now() - 1000 * 60 * 2 }],
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Makita Cordless Drill Kit (2 Batteries)',
+        desc: 'Brushless motor, 18V. Case + bits included.',
+        category: 'Tools',
+        image: 'https://images.unsplash.com/photo-1582312303606-5e6c61b26703?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 9500,
+        minIncrement: 300,
+        buyNow: null,
+        freeShipping: false,
+        endsAt: Date.now() + 1000 * 60 * 58,
+        createdAt: Date.now() - 1000 * 60 * 10,
+        bids: [],
+      },
+    ];
+
+    // --- State ---
+    const state = {
+      auctions: JSON.parse(localStorage.getItem('ax.auctions') || 'null') || sampleAuctions,
+      user: JSON.parse(localStorage.getItem('ax.user') || 'null'),
+      filters: { q: '', category: '', buyNow: false, min: 0, max: Infinity, sort: 'endingSoon' },
+      watchlist: JSON.parse(localStorage.getItem('ax.watch') || '[]'),
+    };
+
+    const el = (sel) => document.querySelector(sel);
+    const els = (sel) => Array.from(document.querySelectorAll(sel));
+
+    const currency = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 });
+
+    function save() {
+      localStorage.setItem('ax.auctions', JSON.stringify(state.auctions));
+      localStorage.setItem('ax.user', JSON.stringify(state.user));
+      localStorage.setItem('ax.watch', JSON.stringify(state.watchlist));
+    }
+
+    // --- Utilities ---
+    function now() { return Date.now(); }
+    function timeLeft(ms) {
+      if (ms <= 0) return 'Ended';
+      const s = Math.floor(ms / 1000);
+      const d = Math.floor(s / 86400);
+      const h = Math.floor((s % 86400) / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const ss = s % 60;
+      if (d) return `${d}d ${h}h`;
+      if (h) return `${h}h ${m}m`;
+      if (m) return `${m}m ${ss}s`;
+      return `${ss}s`;
+    }
+
+    function highestBid(a) {
+      if (!a.bids?.length) return a.startPrice;
+      return Math.max(a.startPrice, ...a.bids.map(b => b.amount));
+    }
+
+    function matchesFilters(a) {
+      const q = state.filters.q.toLowerCase();
+      const price = highestBid(a);
+      const buyOk = state.filters.buyNow ? !!a.buyNow : true;
+      const qOk = q ? (a.title.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q)) : true;
+      const catOk = state.filters.category ? a.category === state.filters.category : true;
+      const minOk = price >= (state.filters.min || 0);
+      const maxOk = price <= (isFinite(state.filters.max) ? state.filters.max : Infinity);
+      return qOk && catOk && minOk && maxOk && buyOk;
+    }
+
+    function sortAuctions(list) {
+      const s = state.filters.sort;
+      const copy = [...list];
+      if (s === 'endingSoon') return copy.sort((a,b) => a.endsAt - b.endsAt);
+      if (s === 'new') return copy.sort((a,b) => b.createdAt - a.createdAt);
+      if (s === 'priceAsc') return copy.sort((a,b) => highestBid(a) - highestBid(b));
+      if (s === 'priceDesc') return copy.sort((a,b) => highestBid(b) - highestBid(a));
+      return copy;
+    }
+
+    function toast(msg) {
+      const t = el('#toast');
+      t.firstElementChild.textContent = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2200);
+    }
+
+    // --- Render ---
+    function renderGrid() {
+      const grid = el('#grid');
+      const list = sortAuctions(state.auctions.filter(matchesFilters));
+      el('#auctionCount').textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
+      grid.innerHTML = '';
+      el('#emptyState').classList.toggle('hidden', list.length !== 0);
+
+      for (const a of list) {
+        const current = highestBid(a);
+        const ended = a.endsAt <= now();
+        const remaining = timeLeft(a.endsAt - now());
+        const isWatched = state.watchlist.includes(a.id);
+        const card = document.createElement('article');
+        card.className = 'rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 shadow-soft flex flex-col';
+        card.innerHTML = `
+          <div class="relative">
+            <img src="${a.image}" alt="${a.title}" class="h-44 w-full object-cover"/>
+            <div class="absolute top-2 left-2 badge border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/80">${a.category}</div>
+            ${a.freeShipping ? '<div class="absolute top-2 right-2 badge border-emerald-200 text-emerald-700 dark:text-emerald-300 dark:border-emerald-800 bg-emerald-50/80">Free ship</div>' : ''}
+          </div>
+          <div class="p-4 flex-1 flex flex-col gap-2">
+            <h3 class="font-semibold ellipsis-2">${a.title}</h3>
+            <div class="text-sm opacity-80 ellipsis-2">${a.desc}</div>
+            <div class="mt-auto grid grid-cols-2 items-end gap-2">
+              <div>
+                <div class="text-xs opacity-70">Current bid</div>
+                <div class="text-lg font-bold">${currency.format(current)}</div>
+                ${a.buyNow ? `<div class="text-xs opacity-70">Buy now: ${currency.format(a.buyNow)}</div>` : ''}
+              </div>
+              <div class="text-right">
+                <div class="text-xs opacity-70">Ends in</div>
+                <div class="font-semibold ${ended ? 'text-rose-600' : ''}">${remaining}</div>
+                <div class="text-xs opacity-70 ellipsis-1">${a.bids.length} bid${a.bids.length===1?'':'s'}</div>
+              </div>
+            </div>
+          </div>
+          <div class="p-4 pt-0 flex gap-2">
+            <button data-aid="${a.id}" class="btn btn-primary flex-1 place-bid">${ended ? 'View' : 'Place bid'}</button>
+            ${a.buyNow ? `<button data-aid="${a.id}" class="btn btn-outline flex-1 buy-now">Buy now</button>` : ''}
+            <button title="Watchlist" data-aid="${a.id}" class="btn btn-outline !px-3 watch">${isWatched ? '★' : '☆'}</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      }
+
+      // Bind actions
+      els('.place-bid').forEach(btn => btn.onclick = () => openBid(btn.dataset.aid));
+      els('.buy-now').forEach(btn => btn.onclick = () => buyNow(btn.dataset.aid));
+      els('.watch').forEach(btn => btn.onclick = () => toggleWatch(btn.dataset.aid));
+    }
+
+    function toggleWatch(id) {
+      const i = state.watchlist.indexOf(id);
+      if (i >= 0) state.watchlist.splice(i,1); else state.watchlist.push(id);
+      save();
+      renderGrid();
+    }
+
+    // --- Bidding ---
+    let currentBidAuctionId = null;
+    function openBid(id) {
+      const a = state.auctions.find(x => x.id === id);
+      if (!a) return;
+      currentBidAuctionId = id;
+      el('#bidItem').textContent = a.title;
+      el('#bidCurrent').textContent = currency.format(highestBid(a));
+      el('#bidMin').textContent = currency.format(a.minIncrement);
+      el('#bidAmount').value = highestBid(a) + a.minIncrement;
+      el('#bidError').textContent = '';
+      el('#bidModal').showModal();
+    }
+
+    function placeBid() {
+      if (!state.user) { el('#authModal').showModal(); return; }
+      const a = state.auctions.find(x => x.id === currentBidAuctionId);
+      if (!a) return;
+      if (a.endsAt <= now()) { toast('Auction ended'); el('#bidModal').close(); return; }
+      const amt = Number(el('#bidAmount').value);
+      const minReq = highestBid(a) + a.minIncrement;
+      if (!Number.isFinite(amt) || amt < minReq) {
+        el('#bidError').textContent = `Enter at least ${currency.format(minReq)}`;
+        el('#bidError').className = 'text-sm text-rose-600';
+        return;
+      }
+      // Optional wallet check (demo)
+      if (state.user?.wallet && amt > state.user.wallet) {
+        el('#bidError').textContent = 'Insufficient wallet balance (demo check)';
+        el('#bidError').className = 'text-sm text-rose-600';
+        return;
+      }
+
+      a.bids.push({ user: state.user?.name || 'You', amount: amt, time: now() });
+      // Anti‑sniping: extend by 1 min if bid arrives in last 30s
+      if (a.endsAt - now() < 30000) a.endsAt += 60000;
+      save();
+      renderGrid();
+      toast('Bid placed ✅');
+      el('#bidModal').close();
+    }
+
+    function buyNow(id) {
+      const a = state.auctions.find(x => x.id === id);
+      if (!a || !a.buyNow) return;
+      if (!state.user) { el('#authModal').showModal(); return; }
+      if (a.endsAt <= now()) { toast('Auction ended'); return; }
+      // Demo: mark ended and set final bid as buyNow
+      a.endsAt = now();
+      a.bids.push({ user: state.user?.name || 'You', amount: a.buyNow, time: now() });
+      save();
+      renderGrid();
+      toast('Purchased instantly 🛒');
+    }
+
+    // --- Create Listing ---
+    function createListing() {
+      if (!state.user) { el('#authModal').showModal(); return; }
+      const title = el('#newTitle').value.trim();
+      const desc = el('#newDesc').value.trim();
+      const category = el('#newCategory').value;
+      const image = el('#newImage').value.trim() || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop';
+      const start = Number(el('#newStart').value);
+      const inc = Number(el('#newIncrement').value);
+      const buy = Number(el('#newBuyNow').value);
+      const durationMins = Number(el('#newDuration').value || 60);
+      const free = el('#newShipping').checked;
+      if (!title || !Number.isFinite(start) || !Number.isFinite(inc)) return;
+      const endsAt = now() + durationMins * 60 * 1000;
+      const a = { id: crypto.randomUUID(), title, desc, category, image, startPrice: start, minIncrement: inc, buyNow: Number.isFinite(buy) && buy>0 ? buy : null, freeShipping: free, endsAt, createdAt: now(), bids: [] };
+      state.auctions.unshift(a);
+      save();
+      renderGrid();
+      el('#sellModal').close();
+      toast('Listing created ✅');
+      // reset form
+      ['#newTitle','#newDesc','#newImage','#newStart','#newIncrement','#newBuyNow','#newDuration'].forEach(id=> el(id).value = '');
+      el('#newShipping').checked = false;
+    }
+
+    // --- Search & Filters ---
+    function applyFilters() {
+      state.filters.q = el('#search').value.trim();
+      state.filters.category = el('#filterCategory').value || '';
+      state.filters.sort = el('#filterSort').value;
+      state.filters.min = Number(el('#filterMin').value || 0);
+      state.filters.max = el('#filterMax').value ? Number(el('#filterMax').value) : Infinity;
+      state.filters.buyNow = el('#filterBuyNow').checked;
+      renderGrid();
+    }
+    function clearFilters() {
+      el('#search').value = '';
+      el('#filterCategory').value = '';
+      el('#filterSort').value = 'endingSoon';
+      el('#filterMin').value = '';
+      el('#filterMax').value = '';
+      el('#filterBuyNow').checked = false;
+      state.filters = { q: '', category: '', buyNow: false, min: 0, max: Infinity, sort: 'endingSoon' };
+      renderGrid();
+    }
+
+    // --- Auth ---
+    function saveAuth() {
+      const name = el('#authName').value.trim() || 'Guest';
+      const wallet = Number(el('#authWallet').value);
+      state.user = { name, wallet: Number.isFinite(wallet) ? wallet : 0 };
+      save();
+      el('#authModal').close();
+      toast(`Signed in as ${name}`);
+      renderGrid();
+      updateAuthUI();
+    }
+
+    function updateAuthUI() {
+      const btn = el('#openLogin');
+      if (state.user) {
+        btn.textContent = `${state.user.name}`;
+        btn.onclick = () => { if (confirm('Sign out?')) { state.user = null; save(); updateAuthUI(); toast('Signed out'); }};
+      } else {
+        btn.textContent = 'Sign in';
+        btn.onclick = () => el('#authModal').showModal();
+      }
+    }
+
+    // --- Live countdown ---
+    setInterval(() => {
+      els('#grid article').forEach((card, idx) => {
+        const list = sortAuctions(state.auctions.filter(matchesFilters));
+        const a = list[idx];
+        if (!a) return;
+        const t = a.endsAt - now();
+        const ended = t <= 0;
+        const timeEl = card.querySelector('.font-semibold');
+        if (timeEl) timeEl.textContent = timeLeft(t);
+        if (ended) card.querySelector('.place-bid').textContent = 'View';
+      });
+    }, 1000);
+
+    // --- Theme ---
+    function setTheme(dark) {
+      document.documentElement.classList.toggle('dark', dark);
+      localStorage.setItem('ax.theme', dark ? 'dark' : 'light');
+    }
+
+    // --- Events ---
+    window.addEventListener('DOMContentLoaded', () => {
+      // Theme init
+      const pref = localStorage.getItem('ax.theme');
+      setTheme(pref ? pref === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
+      el('#themeToggle').onclick = () => setTheme(!document.documentElement.classList.contains('dark'));
+
+      // Buttons
+      el('#openSell').onclick = () => el('#sellModal').showModal();
+      el('#openCreate').onclick = () => el('#sellModal').showModal();
+      el('#openExplore').onclick = () => document.getElementById('grid').scrollIntoView({ behavior: 'smooth' });
+      el('#openLogin').onclick = () => el('#authModal').showModal();
+      el('#createListing').onclick = (e) => { e.preventDefault(); createListing(); };
+      el('#saveAuth').onclick = (e) => { e.preventDefault(); saveAuth(); };
+      el('#submitBid').onclick = (e) => { e.preventDefault(); placeBid(); };
+
+      // Filters
+      el('#applyFilters').onclick = applyFilters;
+      el('#clearFilters').onclick = clearFilters;
+      el('#search').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyFilters(); });
+
+      updateAuthUI();
+      renderGrid();
+    });
+  </script>
+</body>
+</html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AuctionX — E‑Commerce Auction</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Inter', 'ui-sans-serif', 'system-ui']
+          },
+          boxShadow: {
+            soft: '0 6px 30px rgba(2, 6, 23, 0.08)'
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root { color-scheme: light dark; }
+    html, body { height: 100%; }
+    .glass { background: rgba(255,255,255,.65); backdrop-filter: blur(8px); }
+    .dark .glass { background: rgba(2,6,23,.55); }
+    .ellipsis-2 { display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow: hidden; }
+    .ellipsis-1 { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tag { font-size: .675rem; }
+    .btn { @apply inline-flex items-center justify-center rounded-2xl px-4 py-2 font-medium shadow-soft hover:shadow transition; }
+    .btn-primary { @apply bg-indigo-600 text-white hover:bg-indigo-700; }
+    .btn-outline { @apply border border-slate-300/50 dark:border-slate-700 text-slate-700 dark:text-slate-200 hover:bg-slate-50/70 dark:hover:bg-slate-800; }
+    .badge { @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs; }
+    .field { @apply w-full rounded-xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 px-3 py-2 outline-none focus:ring-2 focus:ring-indigo-500; }
+  </style>
+</head>
+<body class="font-display bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100">
+  <!-- Top Bar -->
+  <header class="sticky top-0 z-40 glass border-b border-slate-200/60 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-3 py-3">
+      <div class="flex items-center gap-2">
+        <div class="h-9 w-9 rounded-2xl bg-indigo-600 grid place-items-center text-white font-bold">A</div>
+        <a href="#" class="text-xl font-extrabold">AuctionX</a>
+      </div>
+
+      <div class="flex-1 hidden md:flex">
+        <div class="w-full relative">
+          <input id="search" class="field !rounded-2xl pl-10" placeholder="Search items, brands, categories…" />
+          <svg class="w-5 h-5 absolute left-3 top-2.5 opacity-60" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-5.2-5.2M10.5 18a7.5 7.5 0 1 1 0-15 7.5 7.5 0 0 1 0 15Z"/></svg>
+        </div>
+      </div>
+
+      <nav class="flex items-center gap-2 ml-auto">
+        <button id="themeToggle" class="btn btn-outline !px-3" title="Toggle theme">
+          <svg id="sun" class="w-5 h-5 block dark:hidden" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v2m0 14v2M3 12h2m14 0h2m-3.6-6.4 1.4-1.4M5.2 18.8 3.8 20.2M18.8 18.8l1.4 1.4M5.2 5.2 3.8 3.8"/><circle cx="12" cy="12" r="4" stroke-width="2"/></svg>
+          <svg id="moon" class="w-5 h-5 hidden dark:block" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79Z"/></svg>
+        </button>
+        <button id="openLogin" class="btn btn-outline">Sign in</button>
+        <button id="openSell" class="btn btn-primary">Sell</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Subnav -->
+  <div class="border-b border-slate-200/60 dark:border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-2 flex gap-2 overflow-x-auto">
+      <span class="badge border-slate-200 dark:border-slate-800">🔥 Trending</span>
+      <span class="badge border-slate-200 dark:border-slate-800">💎 Collectibles</span>
+      <span class="badge border-slate-200 dark:border-slate-800">📱 Phones</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🎮 Gaming</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🖥️ Laptops</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🏠 Home</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🧰 Tools</span>
+      <span class="badge border-slate-200 dark:border-slate-800">🚗 Motors</span>
+    </div>
+  </div>
+
+  <!-- Hero / Filters -->
+  <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6 grid md:grid-cols-3 gap-6">
+    <div class="md:col-span-2 p-6 rounded-3xl bg-gradient-to-br from-indigo-600 to-fuchsia-600 text-white shadow-soft">
+      <h1 class="text-3xl md:text-4xl font-extrabold leading-tight">Bid smarter. Win faster. 
+        <span class="block text-white/80 text-lg mt-2">Real‑time auctions with instant checkout and seller protection.</span>
+      </h1>
+      <div class="mt-6 flex gap-3">
+        <button id="openExplore" class="btn bg-white text-indigo-700 hover:bg-slate-100">Explore auctions</button>
+        <button id="openCreate" class="btn btn-outline border-white/60 text-white hover:bg-white/10">Create listing</button>
+      </div>
+    </div>
+    <div class="p-6 rounded-3xl border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 shadow-soft">
+      <h3 class="font-semibold text-lg">Filters</h3>
+      <div class="mt-4 grid grid-cols-2 gap-3">
+        <select id="filterCategory" class="field">
+          <option value="">All categories</option>
+          <option>Collectibles</option>
+          <option>Phones</option>
+          <option>Gaming</option>
+          <option>Laptops</option>
+          <option>Home</option>
+          <option>Tools</option>
+        </select>
+        <select id="filterSort" class="field">
+          <option value="endingSoon">Ending soon</option>
+          <option value="new">Newly listed</option>
+          <option value="priceAsc">Price: Low to High</option>
+          <option value="priceDesc">Price: High to Low</option>
+        </select>
+        <input id="filterMin" type="number" class="field" placeholder="Min price" />
+        <input id="filterMax" type="number" class="field" placeholder="Max price" />
+        <label class="col-span-2 inline-flex items-center gap-2 text-sm opacity-80">
+          <input id="filterBuyNow" type="checkbox" class="rounded" /> Buy Now available
+        </label>
+      </div>
+      <div class="mt-4 flex gap-2">
+        <button id="applyFilters" class="btn btn-primary w-full">Apply</button>
+        <button id="clearFilters" class="btn btn-outline w-full">Reset</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Auctions Grid -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8">
+    <div class="flex items-center justify-between mb-3">
+      <h2 class="text-xl font-bold">Live Auctions</h2>
+      <div class="text-sm opacity-70" id="auctionCount">0 items</div>
+    </div>
+
+    <div id="grid" class="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5"></div>
+
+    <!-- Empty state -->
+    <div id="emptyState" class="hidden text-center p-16 border-2 border-dashed rounded-3xl mt-6">
+      <div class="text-4xl">🧐</div>
+      <p class="mt-3 font-semibold">No auctions found</p>
+      <p class="opacity-70">Try adjusting filters or search.</p>
+    </div>
+  </main>
+
+  <!-- Sell / Create Modal -->
+  <dialog id="sellModal" class="rounded-3xl w-full max-w-2xl p-0 overflow-hidden">
+    <form method="dialog" class="p-0">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="font-semibold">Create Listing</h3>
+        <button class="btn btn-outline !px-3" value="cancel">Close</button>
+      </div>
+      <div class="p-4 grid sm:grid-cols-2 gap-4">
+        <div class="space-y-3">
+          <input id="newTitle" class="field" placeholder="Title" required />
+          <textarea id="newDesc" class="field" placeholder="Description"></textarea>
+          <select id="newCategory" class="field">
+            <option>Collectibles</option>
+            <option>Phones</option>
+            <option>Gaming</option>
+            <option>Laptops</option>
+            <option>Home</option>
+            <option>Tools</option>
+          </select>
+          <input id="newImage" class="field" placeholder="Image URL (optional)" />
+        </div>
+        <div class="space-y-3">
+          <div class="grid grid-cols-2 gap-3">
+            <input id="newStart" type="number" class="field" placeholder="Start price" required />
+            <input id="newIncrement" type="number" class="field" placeholder="Min increment" required />
+          </div>
+          <div class="grid grid-cols-2 gap-3">
+            <input id="newBuyNow" type="number" class="field" placeholder="Buy Now (optional)" />
+            <input id="newDuration" type="number" class="field" placeholder="Duration (mins)" value="60" />
+          </div>
+          <label class="inline-flex items-center gap-2 text-sm opacity-80">
+            <input id="newShipping" type="checkbox" class="rounded" /> Free shipping
+          </label>
+        </div>
+      </div>
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+        <button class="btn btn-outline" value="cancel">Cancel</button>
+        <button id="createListing" class="btn btn-primary" value="default">Create</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Auth Modal -->
+  <dialog id="authModal" class="rounded-3xl w-full max-w-md p-0 overflow-hidden">
+    <form method="dialog" class="p-0">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="font-semibold">Welcome</h3>
+        <button class="btn btn-outline !px-3" value="cancel">Close</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <input id="authName" class="field" placeholder="Your display name"/>
+        <input id="authWallet" class="field" placeholder="Wallet (KSh) — optional" type="number" />
+        <p class="text-sm opacity-70">We'll store your session locally only for demo.</p>
+      </div>
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+        <button class="btn btn-outline" value="cancel">Cancel</button>
+        <button id="saveAuth" class="btn btn-primary" value="default">Continue</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Bid Modal -->
+  <dialog id="bidModal" class="rounded-3xl w-full max-w-md p-0 overflow-hidden">
+    <form method="dialog" class="p-0">
+      <div class="p-4 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between">
+        <h3 class="font-semibold">Place a bid</h3>
+        <button class="btn btn-outline !px-3" value="cancel">Close</button>
+      </div>
+      <div class="p-4 space-y-3">
+        <div id="bidItem" class="font-semibold"></div>
+        <div class="text-sm opacity-70">Current: <span id="bidCurrent"></span> — Min increment: <span id="bidMin"></span></div>
+        <input id="bidAmount" type="number" class="field" placeholder="Your bid" />
+        <div class="text-sm" id="bidError"></div>
+      </div>
+      <div class="p-4 border-t border-slate-200 dark:border-slate-800 flex justify-end gap-2">
+        <button class="btn btn-outline" value="cancel">Cancel</button>
+        <button id="submitBid" class="btn btn-primary" value="default">Place bid</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Toast -->
+  <div id="toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 hidden">
+    <div class="glass rounded-2xl px-4 py-2 border border-slate-200 dark:border-slate-800 shadow-soft text-sm"></div>
+  </div>
+
+  <script>
+    // --- Demo Data ---
+    const sampleAuctions = [
+      {
+        id: crypto.randomUUID(),
+        title: 'iPhone 13 Pro 256GB — Sierra Blue',
+        desc: 'Excellent condition. Battery health 89%. Box + charger. 12 months seller warranty.',
+        category: 'Phones',
+        image: 'https://images.unsplash.com/photo-1631125917297-27d30dc87058?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 55000,
+        minIncrement: 1000,
+        buyNow: 78000,
+        freeShipping: true,
+        endsAt: Date.now() + 1000 * 60 * 45, // 45 mins
+        createdAt: Date.now() - 1000 * 60 * 5,
+        bids: [
+          { user: 'Lena', amount: 56000, time: Date.now() - 1000 * 60 * 4 },
+          { user: 'Omondi', amount: 57500, time: Date.now() - 1000 * 60 * 2 },
+        ],
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Sony PS5 Slim + 2 Controllers',
+        desc: 'Like new. Includes FIFA & Spider‑Man. Nairobi pickup or shipping.',
+        category: 'Gaming',
+        image: 'https://images.unsplash.com/photo-1606813907291-76b3b70c63a0?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 45000,
+        minIncrement: 500,
+        buyNow: 65000,
+        freeShipping: false,
+        endsAt: Date.now() + 1000 * 60 * 8, // 8 mins
+        createdAt: Date.now() - 1000 * 60 * 30,
+        bids: [{ user: 'Jay', amount: 46000, time: Date.now() - 1000 * 60 * 25 }],
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Lenovo Yoga 7 (16GB/512GB) OLED 2‑in‑1',
+        desc: 'Touchscreen, stylus included. Great for creators & students.',
+        category: 'Laptops',
+        image: 'https://images.unsplash.com/photo-1517336714731-489689fd1ca8?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 72000,
+        minIncrement: 2000,
+        buyNow: 98000,
+        freeShipping: true,
+        endsAt: Date.now() + 1000 * 60 * 120, // 2 hours
+        createdAt: Date.now() - 1000 * 60 * 60,
+        bids: [],
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Vintage Vinyl: Michael Jackson — Thriller (1982) Mint',
+        desc: 'Collector grade. Sleek sound. Ships tracked.',
+        category: 'Collectibles',
+        image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 8000,
+        minIncrement: 250,
+        buyNow: 15000,
+        freeShipping: true,
+        endsAt: Date.now() + 1000 * 60 * 5, // 5 mins
+        createdAt: Date.now() - 1000 * 60 * 240,
+        bids: [{ user: 'Aisha', amount: 8250, time: Date.now() - 1000 * 60 * 2 }],
+      },
+      {
+        id: crypto.randomUUID(),
+        title: 'Makita Cordless Drill Kit (2 Batteries)',
+        desc: 'Brushless motor, 18V. Case + bits included.',
+        category: 'Tools',
+        image: 'https://images.unsplash.com/photo-1582312303606-5e6c61b26703?q=80&w=1200&auto=format&fit=crop',
+        startPrice: 9500,
+        minIncrement: 300,
+        buyNow: null,
+        freeShipping: false,
+        endsAt: Date.now() + 1000 * 60 * 58,
+        createdAt: Date.now() - 1000 * 60 * 10,
+        bids: [],
+      },
+    ];
+
+    // --- State ---
+    const state = {
+      auctions: JSON.parse(localStorage.getItem('ax.auctions') || 'null') || sampleAuctions,
+      user: JSON.parse(localStorage.getItem('ax.user') || 'null'),
+      filters: { q: '', category: '', buyNow: false, min: 0, max: Infinity, sort: 'endingSoon' },
+      watchlist: JSON.parse(localStorage.getItem('ax.watch') || '[]'),
+    };
+
+    const el = (sel) => document.querySelector(sel);
+    const els = (sel) => Array.from(document.querySelectorAll(sel));
+
+    const currency = new Intl.NumberFormat('en-KE', { style: 'currency', currency: 'KES', maximumFractionDigits: 0 });
+
+    function save() {
+      localStorage.setItem('ax.auctions', JSON.stringify(state.auctions));
+      localStorage.setItem('ax.user', JSON.stringify(state.user));
+      localStorage.setItem('ax.watch', JSON.stringify(state.watchlist));
+    }
+
+    // --- Utilities ---
+    function now() { return Date.now(); }
+    function timeLeft(ms) {
+      if (ms <= 0) return 'Ended';
+      const s = Math.floor(ms / 1000);
+      const d = Math.floor(s / 86400);
+      const h = Math.floor((s % 86400) / 3600);
+      const m = Math.floor((s % 3600) / 60);
+      const ss = s % 60;
+      if (d) return `${d}d ${h}h`;
+      if (h) return `${h}h ${m}m`;
+      if (m) return `${m}m ${ss}s`;
+      return `${ss}s`;
+    }
+
+    function highestBid(a) {
+      if (!a.bids?.length) return a.startPrice;
+      return Math.max(a.startPrice, ...a.bids.map(b => b.amount));
+    }
+
+    function matchesFilters(a) {
+      const q = state.filters.q.toLowerCase();
+      const price = highestBid(a);
+      const buyOk = state.filters.buyNow ? !!a.buyNow : true;
+      const qOk = q ? (a.title.toLowerCase().includes(q) || a.desc.toLowerCase().includes(q)) : true;
+      const catOk = state.filters.category ? a.category === state.filters.category : true;
+      const minOk = price >= (state.filters.min || 0);
+      const maxOk = price <= (isFinite(state.filters.max) ? state.filters.max : Infinity);
+      return qOk && catOk && minOk && maxOk && buyOk;
+    }
+
+    function sortAuctions(list) {
+      const s = state.filters.sort;
+      const copy = [...list];
+      if (s === 'endingSoon') return copy.sort((a,b) => a.endsAt - b.endsAt);
+      if (s === 'new') return copy.sort((a,b) => b.createdAt - a.createdAt);
+      if (s === 'priceAsc') return copy.sort((a,b) => highestBid(a) - highestBid(b));
+      if (s === 'priceDesc') return copy.sort((a,b) => highestBid(b) - highestBid(a));
+      return copy;
+    }
+
+    function toast(msg) {
+      const t = el('#toast');
+      t.firstElementChild.textContent = msg;
+      t.classList.remove('hidden');
+      setTimeout(() => t.classList.add('hidden'), 2200);
+    }
+
+    // --- Render ---
+    function renderGrid() {
+      const grid = el('#grid');
+      const list = sortAuctions(state.auctions.filter(matchesFilters));
+      el('#auctionCount').textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
+      grid.innerHTML = '';
+      el('#emptyState').classList.toggle('hidden', list.length !== 0);
+
+      for (const a of list) {
+        const current = highestBid(a);
+        const ended = a.endsAt <= now();
+        const remaining = timeLeft(a.endsAt - now());
+        const isWatched = state.watchlist.includes(a.id);
+        const card = document.createElement('article');
+        card.className = 'rounded-3xl overflow-hidden border border-slate-200 dark:border-slate-800 bg-white/70 dark:bg-slate-900/70 shadow-soft flex flex-col';
+        card.innerHTML = `
+          <div class="relative">
+            <img src="${a.image}" alt="${a.title}" class="h-44 w-full object-cover"/>
+            <div class="absolute top-2 left-2 badge border-slate-200 dark:border-slate-800 bg-white/90 dark:bg-slate-900/80">${a.category}</div>
+            ${a.freeShipping ? '<div class="absolute top-2 right-2 badge border-emerald-200 text-emerald-700 dark:text-emerald-300 dark:border-emerald-800 bg-emerald-50/80">Free ship</div>' : ''}
+          </div>
+          <div class="p-4 flex-1 flex flex-col gap-2">
+            <h3 class="font-semibold ellipsis-2">${a.title}</h3>
+            <div class="text-sm opacity-80 ellipsis-2">${a.desc}</div>
+            <div class="mt-auto grid grid-cols-2 items-end gap-2">
+              <div>
+                <div class="text-xs opacity-70">Current bid</div>
+                <div class="text-lg font-bold">${currency.format(current)}</div>
+                ${a.buyNow ? `<div class="text-xs opacity-70">Buy now: ${currency.format(a.buyNow)}</div>` : ''}
+              </div>
+              <div class="text-right">
+                <div class="text-xs opacity-70">Ends in</div>
+                <div class="font-semibold ${ended ? 'text-rose-600' : ''}">${remaining}</div>
+                <div class="text-xs opacity-70 ellipsis-1">${a.bids.length} bid${a.bids.length===1?'':'s'}</div>
+              </div>
+            </div>
+          </div>
+          <div class="p-4 pt-0 flex gap-2">
+            <button data-aid="${a.id}" class="btn btn-primary flex-1 place-bid">${ended ? 'View' : 'Place bid'}</button>
+            ${a.buyNow ? `<button data-aid="${a.id}" class="btn btn-outline flex-1 buy-now">Buy now</button>` : ''}
+            <button title="Watchlist" data-aid="${a.id}" class="btn btn-outline !px-3 watch">${isWatched ? '★' : '☆'}</button>
+          </div>
+        `;
+        grid.appendChild(card);
+      }
+
+      // Bind actions
+      els('.place-bid').forEach(btn => btn.onclick = () => openBid(btn.dataset.aid));
+      els('.buy-now').forEach(btn => btn.onclick = () => buyNow(btn.dataset.aid));
+      els('.watch').forEach(btn => btn.onclick = () => toggleWatch(btn.dataset.aid));
+    }
+
+    function toggleWatch(id) {
+      const i = state.watchlist.indexOf(id);
+      if (i >= 0) state.watchlist.splice(i,1); else state.watchlist.push(id);
+      save();
+      renderGrid();
+    }
+
+    // --- Bidding ---
+    let currentBidAuctionId = null;
+    function openBid(id) {
+      const a = state.auctions.find(x => x.id === id);
+      if (!a) return;
+      currentBidAuctionId = id;
+      el('#bidItem').textContent = a.title;
+      el('#bidCurrent').textContent = currency.format(highestBid(a));
+      el('#bidMin').textContent = currency.format(a.minIncrement);
+      el('#bidAmount').value = highestBid(a) + a.minIncrement;
+      el('#bidError').textContent = '';
+      el('#bidModal').showModal();
+    }
+
+    function placeBid() {
+      if (!state.user) { el('#authModal').showModal(); return; }
+      const a = state.auctions.find(x => x.id === currentBidAuctionId);
+      if (!a) return;
+      if (a.endsAt <= now()) { toast('Auction ended'); el('#bidModal').close(); return; }
+      const amt = Number(el('#bidAmount').value);
+      const minReq = highestBid(a) + a.minIncrement;
+      if (!Number.isFinite(amt) || amt < minReq) {
+        el('#bidError').textContent = `Enter at least ${currency.format(minReq)}`;
+        el('#bidError').className = 'text-sm text-rose-600';
+        return;
+      }
+      // Optional wallet check (demo)
+      if (state.user?.wallet && amt > state.user.wallet) {
+        el('#bidError').textContent = 'Insufficient wallet balance (demo check)';
+        el('#bidError').className = 'text-sm text-rose-600';
+        return;
+      }
+
+      a.bids.push({ user: state.user?.name || 'You', amount: amt, time: now() });
+      // Anti‑sniping: extend by 1 min if bid arrives in last 30s
+      if (a.endsAt - now() < 30000) a.endsAt += 60000;
+      save();
+      renderGrid();
+      toast('Bid placed ✅');
+      el('#bidModal').close();
+    }
+
+    function buyNow(id) {
+      const a = state.auctions.find(x => x.id === id);
+      if (!a || !a.buyNow) return;
+      if (!state.user) { el('#authModal').showModal(); return; }
+      if (a.endsAt <= now()) { toast('Auction ended'); return; }
+      // Demo: mark ended and set final bid as buyNow
+      a.endsAt = now();
+      a.bids.push({ user: state.user?.name || 'You', amount: a.buyNow, time: now() });
+      save();
+      renderGrid();
+      toast('Purchased instantly 🛒');
+    }
+
+    // --- Create Listing ---
+    function createListing() {
+      if (!state.user) { el('#authModal').showModal(); return; }
+      const title = el('#newTitle').value.trim();
+      const desc = el('#newDesc').value.trim();
+      const category = el('#newCategory').value;
+      const image = el('#newImage').value.trim() || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?q=80&w=1200&auto=format&fit=crop';
+      const start = Number(el('#newStart').value);
+      const inc = Number(el('#newIncrement').value);
+      const buy = Number(el('#newBuyNow').value);
+      const durationMins = Number(el('#newDuration').value || 60);
+      const free = el('#newShipping').checked;
+      if (!title || !Number.isFinite(start) || !Number.isFinite(inc)) return;
+      const endsAt = now() + durationMins * 60 * 1000;
+      const a = { id: crypto.randomUUID(), title, desc, category, image, startPrice: start, minIncrement: inc, buyNow: Number.isFinite(buy) && buy>0 ? buy : null, freeShipping: free, endsAt, createdAt: now(), bids: [] };
+      state.auctions.unshift(a);
+      save();
+      renderGrid();
+      el('#sellModal').close();
+      toast('Listing created ✅');
+      // reset form
+      ['#newTitle','#newDesc','#newImage','#newStart','#newIncrement','#newBuyNow','#newDuration'].forEach(id=> el(id).value = '');
+      el('#newShipping').checked = false;
+    }
+
+    // --- Search & Filters ---
+    function applyFilters() {
+      state.filters.q = el('#search').value.trim();
+      state.filters.category = el('#filterCategory').value || '';
+      state.filters.sort = el('#filterSort').value;
+      state.filters.min = Number(el('#filterMin').value || 0);
+      state.filters.max = el('#filterMax').value ? Number(el('#filterMax').value) : Infinity;
+      state.filters.buyNow = el('#filterBuyNow').checked;
+      renderGrid();
+    }
+    function clearFilters() {
+      el('#search').value = '';
+      el('#filterCategory').value = '';
+      el('#filterSort').value = 'endingSoon';
+      el('#filterMin').value = '';
+      el('#filterMax').value = '';
+      el('#filterBuyNow').checked = false;
+      state.filters = { q: '', category: '', buyNow: false, min: 0, max: Infinity, sort: 'endingSoon' };
+      renderGrid();
+    }
+
+    // --- Auth ---
+    function saveAuth() {
+      const name = el('#authName').value.trim() || 'Guest';
+      const wallet = Number(el('#authWallet').value);
+      state.user = { name, wallet: Number.isFinite(wallet) ? wallet : 0 };
+      save();
+      el('#authModal').close();
+      toast(`Signed in as ${name}`);
+      renderGrid();
+      updateAuthUI();
+    }
+
+    function updateAuthUI() {
+      const btn = el('#openLogin');
+      if (state.user) {
+        btn.textContent = `${state.user.name}`;
+        btn.onclick = () => { if (confirm('Sign out?')) { state.user = null; save(); updateAuthUI(); toast('Signed out'); }};
+      } else {
+        btn.textContent = 'Sign in';
+        btn.onclick = () => el('#authModal').showModal();
+      }
+    }
+
+    // --- Live countdown ---
+    setInterval(() => {
+      els('#grid article').forEach((card, idx) => {
+        const list = sortAuctions(state.auctions.filter(matchesFilters));
+        const a = list[idx];
+        if (!a) return;
+        const t = a.endsAt - now();
+        const ended = t <= 0;
+        const timeEl = card.querySelector('.font-semibold');
+        if (timeEl) timeEl.textContent = timeLeft(t);
+        if (ended) card.querySelector('.place-bid').textContent = 'View';
+      });
+    }, 1000);
+
+    // --- Theme ---
+    function setTheme(dark) {
+      document.documentElement.classList.toggle('dark', dark);
+      localStorage.setItem('ax.theme', dark ? 'dark' : 'light');
+    }
+
+    // --- Events ---
+    window.addEventListener('DOMContentLoaded', () => {
+      // Theme init
+      const pref = localStorage.getItem('ax.theme');
+      setTheme(pref ? pref === 'dark' : window.matchMedia('(prefers-color-scheme: dark)').matches);
+      el('#themeToggle').onclick = () => setTheme(!document.documentElement.classList.contains('dark'));
+
+      // Buttons
+      el('#openSell').onclick = () => el('#sellModal').showModal();
+      el('#openCreate').onclick = () => el('#sellModal').showModal();
+      el('#openExplore').onclick = () => document.getElementById('grid').scrollIntoView({ behavior: 'smooth' });
+      el('#openLogin').onclick = () => el('#authModal').showModal();
+      el('#createListing').onclick = (e) => { e.preventDefault(); createListing(); };
+      el('#saveAuth').onclick = (e) => { e.preventDefault(); saveAuth(); };
+      el('#submitBid').onclick = (e) => { e.preventDefault(); placeBid(); };
+
+      // Filters
+      el('#applyFilters').onclick = applyFilters;
+      el('#clearFilters').onclick = clearFilters;
+      el('#search').addEventListener('keydown', (e) => { if (e.key === 'Enter') applyFilters(); });
+
+      updateAuthUI();
+      renderGrid();
+    });
+  </script>
+</body>
+</html>
